@@ -1,9 +1,16 @@
 #include "serialProcessing.h"
 #include <Arduino.h>
+#include "board.h"
+#include "hardwareTypes.h"
+
+#ifdef TEENSY20
 #include <usb_api.h>
+#endif
+
 
 
 //static char *receivedChars;
+#ifdef TEENSY20
 
 char * CheckSerial(usb_serial_class port)
 {
@@ -15,17 +22,17 @@ char * CheckSerial(usb_serial_class port)
   
   while (port.available() > 0 && newData == false) {
     rc = port.read();
-    if (rc != endMarker) 
+    if (rc != endMarker)
     {
-       receivedChars[ndx] = rc;
-       ndx++;
-       if (ndx >= numChars) 
-       {
-          ndx = numChars - 1;
-       }
+      receivedChars[ndx] = rc;
+      ndx++;
+      if (ndx >= numChars)
+      {
+        ndx = numChars - 1;
+      }
     }
-   
-    else 
+    
+    else
     {
       
       receivedChars[ndx] = '\0'; // terminate the string
@@ -34,12 +41,13 @@ char * CheckSerial(usb_serial_class port)
     }
   }
 
-//if (newData){
-//  port.println(receivedChars);
-//}
+  //if (newData){
+  //  port.println(receivedChars);
+  //}
   
   return receivedChars;
 }
+#endif // TEENSY20
 
 char * CheckSerial(HardwareSerial port)
 {
@@ -51,17 +59,17 @@ char * CheckSerial(HardwareSerial port)
   
   while (port.available() > 0 && newData == false) {
     rc = port.read();
-    if (rc != endMarker) 
+    if (rc != endMarker)
     {
-       receivedChars[ndx] = rc;
-       ndx++;
-       if (ndx >= numChars) 
-       {
-          ndx = numChars - 1;
-       }
+      receivedChars[ndx] = rc;
+      ndx++;
+      if (ndx >= numChars)
+      {
+        ndx = numChars - 1;
+      }
     }
-   
-    else 
+    
+    else
     {
       
       receivedChars[ndx] = '\0'; // terminate the string
@@ -70,19 +78,57 @@ char * CheckSerial(HardwareSerial port)
     }
   }
 
-//if (newData){
-//  port.println(receivedChars);
-//}
+  //if (newData){
+  //  port.println(receivedChars);
+  //}
 
   return receivedChars;
 }
 
-serialCommand GetSerialArgs(char * serialData, uint16_t hardwareTypes[])
+#ifdef LEONARDO
+char * CheckSerial(Serial_ port)
+{
+  static byte ndx = 0;
+  char endMarker = '\n';
+  char rc;
+  boolean newData = false;
+  //receivedChars[numChars]; // an array to store the received data
+  
+  while (port.available() > 0 && newData == false) {
+    rc = port.read();
+    if (rc != endMarker)
+    {
+      receivedChars[ndx] = rc;
+      ndx++;
+      if (ndx >= numChars)
+      {
+        ndx = numChars - 1;
+      }
+    }
+    
+    else
+    {
+      
+      receivedChars[ndx] = '\0'; // terminate the string
+      ndx = 0;
+      newData = true;
+    }
+  }
+
+  //if (newData){
+  //  port.println(receivedChars);
+  //}
+
+  return receivedChars;
+}
+#endif
+
+serialCommand GetSerialArgs(char * serialData)
 {
   serialCommand c;
   char delim[] = ";";
   char *ptr = strtok(serialData, delim);
-  uint16_t loopCounter = 0;  
+  uint16_t loopCounter = 0;
   char *splitStrings[10];
   
   while(ptr != NULL)
@@ -92,8 +138,8 @@ serialCommand GetSerialArgs(char * serialData, uint16_t hardwareTypes[])
     loopCounter++;
   }
 
-  if (!ExistsInIntArray(hardwareTypes, atoi(splitStrings[0]))){return c;}
-     
+  if (!ExistsInIntArray(int_hardwareTypes, atoi(splitStrings[0]))){return c;}
+  
   c.hardwareType = atoi(splitStrings[0]);
   c.value = splitStrings[1];
   
@@ -107,12 +153,12 @@ serialCommand GetSerialArgs(char * serialData, uint16_t hardwareTypes[])
 
 bool ExistsInIntArray(uint16_t *arrayToCheck, uint16_t numberToCheck)
 {
-   for (unsigned int i = 0; i < sizeof(arrayToCheck); i++)
-   {
-      if (arrayToCheck[i] == numberToCheck)
-      {
-          return true;
-      }
+  for (unsigned int i = 0; i < sizeof(arrayToCheck); i++)
+  {
+    if (arrayToCheck[i] == numberToCheck)
+    {
+      return true;
     }
-   return false;
+  }
+  return false;
 }

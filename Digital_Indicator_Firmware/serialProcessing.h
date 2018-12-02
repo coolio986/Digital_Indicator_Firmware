@@ -2,6 +2,12 @@
 #define __SERIALPROCESSING_H__
 
 #include <Arduino.h>
+#include "board.h"
+#include "hardwareTypes.h"
+
+#ifdef TEENSY20
+#include <usb_api.h>
+#endif
 
 const byte numChars = 32;
 static char receivedChars[numChars]; // an array to store the received data
@@ -14,10 +20,17 @@ typedef struct
   
 } serialCommand;
 
-
+#ifdef TEENSY20
 char * CheckSerial(usb_serial_class port);
+#endif
+
 char * CheckSerial(HardwareSerial port);
-serialCommand GetSerialArgs(char * serialData, uint16_t hardwareTypes[]);
+
+#ifdef LEONARDO
+char * CheckSerial(Serial_ port);
+#endif
+
+serialCommand GetSerialArgs(char * serialData);
 bool ExistsInIntArray(uint16_t *arrayToCheck, uint16_t numberToCheck);
 
 
