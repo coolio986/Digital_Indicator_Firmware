@@ -1,5 +1,7 @@
 #include "serialProcessing.h"
 #include <Arduino.h>
+#include <usb_api.h>
+
 
 //static char *receivedChars;
 

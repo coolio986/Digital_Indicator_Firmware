@@ -18,6 +18,7 @@ int req = 3; //mic REQ line goes to pin 5 through q1 (arduino high pulls request
 int dat = 2; //mic Data line goes to pin 2
 int clk = 0; //mic Clock line goes to pin 3
 
+bool IsInSimulationMode;
 
 String dataStream;
 uint32_t spcTimeDelay = 100;
@@ -44,6 +45,11 @@ void loop()
 {
   RunSPCDataLoop();
   CheckSerialCommands();
+
+  if (IsInSimulationMode)
+  {
+    PrintRandomDiameterData();
+  }
     
   delay(50);
 }
@@ -51,8 +57,9 @@ void loop()
 void CheckSerialCommands()
 {
   
-  if (Serial.available() > 0 ) 
+  if (Serial.available() > 0 )
   {
+    //Serial.println("check serial commands");
     char * usbData = CheckSerial(Serial);
     sCommand = GetSerialArgs(usbData, hardwareTypes);
 
@@ -61,6 +68,7 @@ void CheckSerialCommands()
       case 0:
         break;
       case 1:
+        CheckInteralCommands(sCommand.value);
         break;
       case 2:
         HWSERIAL.println(sCommand.value);
@@ -75,12 +83,13 @@ void CheckSerialCommands()
     }
     
   }
-    
+  
   if (HWSERIAL.available() > 0) {
     char * serial1Data = CheckSerial(HWSERIAL);
 
     Serial.print("2;");
-    Serial.println(serial1Data);
+    Serial.print(serial1Data);
+    Serial.println(";");
     
   }
 }
@@ -142,6 +151,39 @@ void RunSPCDataLoop()
     dataStream = "";
     digitalWrite(req, LOW);
 }
-
+int CheckInteralCommands(char *code)
+{
+  //Serial.println("sim mode routine");
+  if (strcmp(sCommand.value, "IsInSimulationMode = true") == 0)
+  {
+    //Serial.println("sim mode active");
+    IsInSimulationMode = true;
+  }
+  if (strcmp(sCommand.value, "IsInSimulationMode = false") == 0)
+  {
+    //Serial.println("sim mode inactive");
+    IsInSimulationMode = false;
+  }
+  return 0;
+}
+int PrintRandomDiameterData()
+{
+  char diameter[5];
+  ltoa(random(17000, 18000), diameter, 10);
+  byte arr[5];
+  byte ofBits[4];
+  
+  Serial.print("111111111111111111110000");
+  for (int i = 0; i < 5; i++)
+  {
+    for (int j = 0; j < 4; j++)
+    {
+      //ofBits[j] = ((byte)diameter[i] >> j) & 1;
+      Serial.print(((byte)diameter[i] >> j) & 1);
+    }
+  }
+  Serial.println("00100000");
+  return 0;
+}
 
   
