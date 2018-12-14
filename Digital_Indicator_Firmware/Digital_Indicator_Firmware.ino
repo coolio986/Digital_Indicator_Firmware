@@ -14,11 +14,21 @@
 #include "hardwareTypes.h"
 
 
+#ifdef LEONARDO
+#include <SoftwareSerial.h>
+
+#endif
+
 
 
 int req = 3; //mic REQ line goes to pin 5 through q1 (arduino high pulls request line low)
 int dat = 2; //mic Data line goes to pin 2
 int clk = 0; //mic Clock line goes to pin 3
+
+
+//****SoftwareSerial1 port pins****//
+#define SS1_RX 8
+#define SS1_TX 9
 
 bool IsInSimulationMode;
 
@@ -28,19 +38,38 @@ uint32_t spcTimeDelay = 100;
 serialCommand sCommand;
 
 // set this to the hardware serial port you wish to use
+#ifdef TEENSY20
 #define HWSERIAL Serial1
+#endif
+
+#ifdef LEONARDO
+SoftwareSerial *HWSERIAL;
+
+#endif
 
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   pinMode(req, OUTPUT);
   pinMode(clk, INPUT_PULLUP);
   pinMode(dat, INPUT_PULLUP);
+
   
-  HWSERIAL.begin(115200);
+  
+  HWSERIAL = &SoftwareSerial(SS1_RX, SS1_TX);
+  
+  pinMode(SS1_RX, INPUT);
+  pinMode(SS1_TX, OUTPUT);
+
+  HWSERIAL->begin(SERIAL_BAUD);
+  HWSERIAL->listen();
+  #ifdef TEENSY20
   HWSERIAL.setTimeout(100);
+  #endif
+  
   digitalWrite(req, HIGH); // set request at high via transistor
+  
 }
 
 void loop()
@@ -48,7 +77,6 @@ void loop()
   RunSPCDataLoop();
   CheckSerialCommands();
 
-  
     
   delay(50);
 }
@@ -58,6 +86,7 @@ void CheckSerialCommands()
   
   if (Serial.available() > 0 )
   {
+    
     char * usbData = CheckSerial(Serial);
     sCommand = GetSerialArgs(usbData);
     
@@ -96,21 +125,26 @@ void CheckSerialCommands()
     //}
     
   }
+  
 
   if (!IsInSimulationMode)
   {
-    if (HWSERIAL.available() > 0) {
-      char * serial1Data = CheckSerial(HWSERIAL);
-
-      Serial.print(hardwareType.spooler);
-      Serial.print(";");
-      Serial.print(serial1Data);
-      Serial.println(";");
+  
+    //if (HWSERIAL->available() > 0) {
+           
+      char * serialData = CheckSerial(HWSERIAL);
+      if (strlen(serialData) > 1) 
+      {
+        Serial.print(hardwareType.spooler);
+        Serial.print(";");
+        Serial.print(serialData);
+        Serial.println(";");
+      }  
       
-    }
+    
+  //}
   }
 }
-
 
 void RunSPCDataLoop()
 {
@@ -198,10 +232,17 @@ int CheckSpoolerCommands(char *code)
   if (IsInSimulationMode){
     if (startsWith("getrpm", code))
     {
-   
       PrintRandomRPMData();
     }
+    
   }
+  else
+    {
+       
+      HWSERIAL->println(code);
+      
+      
+    }
   return 0;
 }
 

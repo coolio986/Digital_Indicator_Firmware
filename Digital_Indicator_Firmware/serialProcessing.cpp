@@ -3,6 +3,10 @@
 #include "board.h"
 #include "hardwareTypes.h"
 
+#ifdef LEONARDO
+#include <SoftwareSerial.h>
+#endif
+
 #ifdef TEENSY20
 #include <usb_api.h>
 #endif
@@ -52,7 +56,7 @@ char * CheckSerial(usb_serial_class port)
 char * CheckSerial(HardwareSerial port)
 {
   static byte ndx = 0;
-  char endMarker = '\n';
+  char endMarker = '\r';
   char rc;
   boolean newData = false;
   //receivedChars[numChars]; // an array to store the received data
@@ -84,6 +88,7 @@ char * CheckSerial(HardwareSerial port)
 
   return receivedChars;
 }
+
 
 #ifdef LEONARDO
 char * CheckSerial(Serial_ port)
@@ -121,7 +126,50 @@ char * CheckSerial(Serial_ port)
 
   return receivedChars;
 }
+
+char * CheckSerial(SoftwareSerial *port)
+{
+  byte ndx = 0;
+  char endMarker = '\n';
+  char rc;
+  boolean newData = false;
+  char *chars2 = malloc(numChars);
+  char chars[numChars] = {};
+  
+  
+  
+  while (port->available() > 0 && newData == false) {
+    
+    rc = port->read();
+    
+    if (rc != endMarker)
+    {
+      chars[ndx] = rc;
+      ndx++;
+      if (ndx >= numChars)
+      {
+        ndx = numChars - 1;
+      }
+    }
+    
+    else
+    {
+      
+      chars[ndx] = '\0'; // terminate the string
+      ndx = 0;
+      newData = true;
+    }
+    
+  }
+chars2 = chars;
+  if (newData){
+    //Serial.println(chars2);
+  }
+//Serial.println(chars);
+  return chars2;
+}
 #endif
+
 
 serialCommand GetSerialArgs(char * serialData)
 {

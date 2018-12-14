@@ -5,9 +5,15 @@
 #include "board.h"
 #include "hardwareTypes.h"
 
+#ifdef LEONARDO
+#include <SoftwareSerial.h>
+#endif
+
 #ifdef TEENSY20
 #include <usb_api.h>
 #endif
+
+
 
 const byte numChars = 32;
 static char receivedChars[numChars]; // an array to store the received data
@@ -28,6 +34,7 @@ char * CheckSerial(HardwareSerial port);
 
 #ifdef LEONARDO
 char * CheckSerial(Serial_ port);
+char * CheckSerial(SoftwareSerial *port);
 #endif
 
 serialCommand GetSerialArgs(char * serialData);
