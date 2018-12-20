@@ -57,15 +57,19 @@ void setup()
 
   
   
-  HWSERIAL = &SoftwareSerial(SS1_RX, SS1_TX);
+  
   
   pinMode(SS1_RX, INPUT);
   pinMode(SS1_TX, OUTPUT);
 
+  
+  #ifdef TEENSY20
+  HWSERIAL.begin(SERIAL_BAUD);
+  HWSERIAL.setTimeout(100);
+  #else
+  HWSERIAL = &SoftwareSerial(SS1_RX, SS1_TX);
   HWSERIAL->begin(SERIAL_BAUD);
   HWSERIAL->listen();
-  #ifdef TEENSY20
-  HWSERIAL.setTimeout(100);
   #endif
   
   digitalWrite(req, HIGH); // set request at high via transistor
@@ -238,8 +242,12 @@ int CheckSpoolerCommands(char *code)
   }
   else
     {
-       
-      HWSERIAL->println(code);
+      #ifdef TEENSY20
+        HWSERIAL.println(code);
+      #else
+        HWSERIAL->println(code);
+      #endif
+      
       
       
     }

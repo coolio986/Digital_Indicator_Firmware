@@ -5,7 +5,7 @@
 
 #define SERIAL_BAUD (32400) //baud rate for the serial ports
 
-#define BOARDTYPE 1 //0 = TEENSY20   1 = LEONARDO
+#define BOARDTYPE 0 //0 = TEENSY20   1 = LEONARDO
 
 #if BOARDTYPE == 0
 #define TEENSY20
