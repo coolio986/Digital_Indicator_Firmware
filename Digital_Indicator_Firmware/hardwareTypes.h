@@ -2,34 +2,36 @@
 #define __HARDWARETYPES_H__
 
 
-const int INTERNALDEVICE = 1;
-const int SPOOLER = 2; //spooler
-const int INDICATOR = 3; //indicator
-const int EXTRUDER = 4; //extruder
+
+const int INDICATOR = 0; //indicator
+const int SPOOLER = 1; //spooler
+const int EXTRUDER = 2; //extruder
+const int INTERNALDEVICE = 100;
 
 typedef struct{
-  
-  uint16_t internal; //internal
-  uint16_t spooler; //spooler
   uint16_t indicator; //indicator
+  uint16_t spooler; //spooler
   uint16_t extruder; //extruder
+  uint16_t internal; //internal
 } struct_hardwareTypes;
 
 const static struct_hardwareTypes hardwareType =
 {
-  .internal = INTERNALDEVICE,
-  .spooler = SPOOLER,
+  
   .indicator = INDICATOR,
-  .extruder = EXTRUDER  
+  .spooler = SPOOLER,
+  .extruder = EXTRUDER,
+  .internal = INTERNALDEVICE
 };
 
 static uint16_t int_hardwareTypes[] =
 {
   
-  INTERNALDEVICE, // 1 = internal
-  SPOOLER, //2 = spooler
-  INDICATOR, //3 = indicator
-  EXTRUDER, //4 = extruder
+  
+  INDICATOR, //0 = indicator
+  SPOOLER, //1 = spooler
+  EXTRUDER, //2 = extruder
+  INTERNALDEVICE, // 100 = internal
 };
 
 #endif//__HARDWARETYPES_H__

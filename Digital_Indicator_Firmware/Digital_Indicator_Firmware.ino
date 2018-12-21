@@ -1,3 +1,8 @@
+/*Begining of Auto generated code by Atmel studio */
+#include <Arduino.h>
+
+/*End of auto generated code by Atmel studio */
+
 /*===========================================================
 * Project: Digital_Indicator_Firmware
 * Developled using Arduino v1.8.5
@@ -12,18 +17,27 @@
 
 #include "serialProcessing.h"
 #include "hardwareTypes.h"
+#include "spcProcessing.h"
 
 
 #ifdef LEONARDO
 #include <SoftwareSerial.h>
-
+//Beginning of Auto generated function prototypes by Atmel Studio
+void CheckSerialCommands();
+void RunSPCDataLoop();
+int CheckInteralCommands(char* code);
+int CheckSpoolerCommands(char* code);
+int PrintRandomDiameterData();
+int PrintRandomRPMData();
+bool startsWith(const char* pre, const char* str);
+//End of Auto generated function prototypes by Atmel Studio
 #endif
 
 
 
-int req = 3; //mic REQ line goes to pin 5 through q1 (arduino high pulls request line low)
-int dat = 2; //mic Data line goes to pin 2
-int clk = 0; //mic Clock line goes to pin 3
+//int req = 3; //mic REQ line goes to pin 5 through q1 (arduino high pulls request line low)
+//int dat = 2; //mic Data line goes to pin 2
+//int clk = 0; //mic Clock line goes to pin 3
 
 
 //****SoftwareSerial1 port pins****//
@@ -37,51 +51,31 @@ uint32_t spcTimeDelay = 100;
 
 serialCommand sCommand;
 
-// set this to the hardware serial port you wish to use
-#ifdef TEENSY20
 #define HWSERIAL Serial1
-#endif
 
-#ifdef LEONARDO
-SoftwareSerial *HWSERIAL;
-
-#endif
-
+SpcProcessing _spcProcessing;
 
 void setup()
 {
-  Serial.begin(115200);
-  pinMode(req, OUTPUT);
-  pinMode(clk, INPUT_PULLUP);
-  pinMode(dat, INPUT_PULLUP);
-
-  
-  
-  
-  
-  pinMode(SS1_RX, INPUT);
-  pinMode(SS1_TX, OUTPUT);
-
-  
-  #ifdef TEENSY20
+  Serial.begin(SERIAL_BAUD);
   HWSERIAL.begin(SERIAL_BAUD);
   HWSERIAL.setTimeout(100);
-  #else
-  HWSERIAL = &SoftwareSerial(SS1_RX, SS1_TX);
-  HWSERIAL->begin(SERIAL_BAUD);
-  HWSERIAL->listen();
-  #endif
   
-  digitalWrite(req, HIGH); // set request at high via transistor
+  _spcProcessing.Setup();
+
+
   
 }
 
 void loop()
 {
-  RunSPCDataLoop();
+  //RunSPCDataLoop();
+  _spcProcessing.IsInSimulationMode = IsInSimulationMode;
+  _spcProcessing.RunSPCDataLoop();
+
   CheckSerialCommands();
 
-    
+  
   delay(50);
 }
 
@@ -98,10 +92,10 @@ void CheckSerialCommands()
 
     (sCommand.hardwareType == hardwareType.spooler) &&
     (
-      //HWSERIAL.println(sCommand.value);
-      //Serial.print("sent to spooler: ");
-      //Serial.println(sCommand.value);
-      CheckSpoolerCommands(sCommand.value)
+    //HWSERIAL.println(sCommand.value);
+    //Serial.print("sent to spooler: ");
+    //Serial.println(sCommand.value);
+    CheckSpoolerCommands(sCommand.value)
     );
 
     (sCommand.hardwareType == hardwareType.indicator) && (0);
@@ -133,87 +127,87 @@ void CheckSerialCommands()
 
   if (!IsInSimulationMode)
   {
-  
+    
     //if (HWSERIAL->available() > 0) {
-           
-      char * serialData = CheckSerial(HWSERIAL);
-      if (strlen(serialData) > 1) 
-      {
-        Serial.print(hardwareType.spooler);
-        Serial.print(";");
-        Serial.print(serialData);
-        Serial.println(";");
-      }  
-      
     
+    char * serialData = CheckSerial(HWSERIAL);
+    if (strlen(serialData) > 1)
+    {
+      Serial.print(hardwareType.spooler);
+      Serial.print(";");
+      Serial.print(serialData);
+      Serial.println(";");
+    }
+    
+    
+    //}
+  }
+}
+
+//void RunSPCDataLoop()
+//{
+//
+  //if (IsInSimulationMode)
+  //{
+    //PrintRandomDiameterData();
   //}
-  }
-}
-
-void RunSPCDataLoop()
-{
-
-  if (IsInSimulationMode)
-  {
-    PrintRandomDiameterData();
-  }
-  else
-  {
-    digitalWrite(req, HIGH); // generate set request
-
-
-    //currentMillis = millis();
-    for (int i = 0; i < 13; i++ )
-    {
-      
-
-      for (int j = 0; j < 4; j++)
-      {
-        //*****Edge from high to low*****//
-        uint32_t delayCounts = 0;
-        while ( digitalRead(clk) == HIGH)
-        {
-          delayCounts++;
-          if (delayCounts >= spcTimeDelay){ break;}
-          delayMicroseconds(1);
-        } // hold until clock is high
-
-        delayCounts = 0;
-        while ( digitalRead(clk) == LOW)
-        {
-          delayCounts++;
-          if (delayCounts >= spcTimeDelay){ break;}
-          delayMicroseconds(1);
-        } // hold until clock is low
-        //***************************//
-        
-        //bitWrite(k, j, (digitalRead(dat) & 0x1 )); // read data bits, and reverse order )
-        //Serial.print(digitalRead(dat));
-        dataStream += digitalRead(dat);
-
-      }
-    }
-    
-    bool dataStreamValid = false;
-    for (unsigned int i = 0; i < dataStream.length(); i++)
-    {
-      if (dataStream[i] == 0)
-      {
-        dataStreamValid = true;
-        break;
-      }
-    }
-    
-    if (dataStreamValid)
-    {
-      Serial.print("3;");
-      Serial.println(dataStream);
-    }
-    
-    dataStream = "";
-    digitalWrite(req, LOW);
-  }
-}
+  //else
+  //{
+    //digitalWrite(req, HIGH); // generate set request
+//
+//
+    ////currentMillis = millis();
+    //for (int i = 0; i < 13; i++ )
+    //{
+      //
+//
+      //for (int j = 0; j < 4; j++)
+      //{
+        ////*****Edge from high to low*****//
+        //uint32_t delayCounts = 0;
+        //while ( digitalRead(clk) == HIGH)
+        //{
+          //delayCounts++;
+          //if (delayCounts >= spcTimeDelay){ break;}
+          //delayMicroseconds(1);
+        //} // hold until clock is high
+//
+        //delayCounts = 0;
+        //while ( digitalRead(clk) == LOW)
+        //{
+          //delayCounts++;
+          //if (delayCounts >= spcTimeDelay){ break;}
+          //delayMicroseconds(1);
+        //} // hold until clock is low
+        ////***************************//
+        //
+        ////bitWrite(k, j, (digitalRead(dat) & 0x1 )); // read data bits, and reverse order )
+        ////Serial.print(digitalRead(dat));
+        //dataStream += digitalRead(dat);
+//
+      //}
+    //}
+    //
+    //bool dataStreamValid = false;
+    //for (unsigned int i = 0; i < dataStream.length(); i++)
+    //{
+      //if (dataStream[i] == 0)
+      //{
+        //dataStreamValid = true;
+        //break;
+      //}
+    //}
+    //
+    //if (dataStreamValid)
+    //{
+      //Serial.print("3;");
+      //Serial.println(dataStream);
+    //}
+    //
+    //dataStream = "";
+    //digitalWrite(req, LOW);
+  //}
+//}
 
 int CheckInteralCommands(char *code)
 {
@@ -230,6 +224,7 @@ int CheckInteralCommands(char *code)
   }
   return 0;
 }
+
 int CheckSpoolerCommands(char *code)
 {
   
@@ -238,38 +233,15 @@ int CheckSpoolerCommands(char *code)
     {
       PrintRandomRPMData();
     }
-    
   }
   else
-    {
-      #ifdef TEENSY20
-        HWSERIAL.println(code);
-      #else
-        HWSERIAL->println(code);
-      #endif
-      
-      
-      
-    }
+  {
+    HWSERIAL.println(code);
+  }
   return 0;
 }
 
-int PrintRandomDiameterData()
-{
-  char diameter[5];
-  ltoa(random(17000, 18000), diameter, 10);
-  
-  Serial.print("3;111111111111111111110000");
-  for (int i = 0; i < 5; i++)
-  {
-    for (int j = 0; j < 4; j++)
-    {
-      Serial.print(((byte)diameter[i] >> j) & 1);
-    }
-  }
-  Serial.println("00100000");
-  return 0;
-}
+
 
 int PrintRandomRPMData()
 {
