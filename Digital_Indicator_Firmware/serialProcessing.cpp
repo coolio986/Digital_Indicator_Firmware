@@ -99,7 +99,7 @@ char * CheckSerial(Serial_ port)
   boolean newData = false;
   //receivedChars[numChars]; // an array to store the received data
   
-  while (port.available() > 0 && newData == false) {
+  if (port.available() > 0 && newData == false) {
     rc = port.read();
     if (rc != endMarker)
     {
@@ -161,13 +161,49 @@ char * CheckSerial(SoftwareSerial *port)
     }
     
   }
-chars2 = chars;
+  chars2 = chars;
   if (newData){
     //Serial.println(chars2);
   }
-//Serial.println(chars);
+  //Serial.println(chars);
   return chars2;
 }
+
+char * CleanseData(char *data)
+{
+  char endMarker = 0x00; //null character
+  boolean newData = false;
+  char *chars2 = malloc(numChars);
+  char chars[numChars] = {};
+
+  for (byte i = 0; i < numChars; i++)
+  {
+    if (data[i] != endMarker && newData == false )
+    {
+      
+      if (data[i] != 0x0A)
+      {
+        chars[i] = data[i];
+      }
+      else
+      {
+        chars[i] = 0x20;
+      }
+    }
+    
+    else
+    {
+      i = 0;
+      chars2 = chars;
+      //Serial.println(chars2);
+      newData = true;
+      return chars2;
+    }
+  }
+  
+  return chars2;
+}
+
 #endif
 
 

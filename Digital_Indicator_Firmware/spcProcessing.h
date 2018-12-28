@@ -1,5 +1,5 @@
 /*
-* spcProcessing.h
+* SpcProcessing.h
 *
 * Created: 12/20/2018 4:57:59 PM
 * Author: Anthony
@@ -23,7 +23,9 @@ class SpcProcessing
   int req = INDICATOR_REQ; //mic REQ line goes to pin 5 through q1 (arduino high pulls request line low)
   int dat = INDICATOR_DAT; //mic Data line goes to pin 2
   int clk = INDICATOR_CLK; //mic Clock line goes to pin 3
-  uint32_t spcTimeDelay = 100;
+  uint32_t loopTime = 50;
+  uint32_t currentMillis = 0;
+  uint32_t previousMillis = 0;
   String dataStream;
 
   //functions

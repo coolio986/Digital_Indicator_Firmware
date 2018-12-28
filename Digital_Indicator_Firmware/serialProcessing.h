@@ -35,6 +35,7 @@ char * CheckSerial(HardwareSerial port);
 #ifdef LEONARDO
 char * CheckSerial(Serial_ port);
 char * CheckSerial(SoftwareSerial *port);
+char * CleanseData(char *data);
 #endif
 
 serialCommand GetSerialArgs(char * serialData);

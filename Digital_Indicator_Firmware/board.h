@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#define SERIAL_BAUD (32400) //baud rate for the serial ports
+#define SERIAL_BAUD (115200) //baud rate for the serial ports
 
 //#define BOARDTYPE 0 //0 = TEENSY20   1 = LEONARDO
 
@@ -17,8 +17,8 @@
 #endif
 
 
-#define INDICATOR_REQ  3
+#define INDICATOR_REQ  5
 #define INDICATOR_DAT  2
-#define INDICATOR_CLK  0
+#define INDICATOR_CLK  3
 
 #endif//__BOARD_H__

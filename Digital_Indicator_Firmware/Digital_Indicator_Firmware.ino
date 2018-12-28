@@ -17,7 +17,8 @@
 
 #include "serialProcessing.h"
 #include "hardwareTypes.h"
-#include "spcProcessing.h"
+#include "SpcProcessing.h"
+#include "SerialPortExpander.h"
 
 
 #ifdef LEONARDO
@@ -53,16 +54,18 @@ serialCommand sCommand;
 
 #define HWSERIAL Serial1
 
+
 SpcProcessing _spcProcessing;
+SerialPortExpander _serialPortExpander;
 
 void setup()
 {
-  Serial.begin(SERIAL_BAUD);
-  HWSERIAL.begin(SERIAL_BAUD);
-  HWSERIAL.setTimeout(100);
+  //Serial.begin(SERIAL_BAUD);
+  //HWSERIAL.begin(SERIAL_BAUD);
+  //HWSERIAL.setTimeout(100);
   
   _spcProcessing.Setup();
-
+  _serialPortExpander.Setup();
 
   
 }
@@ -72,11 +75,13 @@ void loop()
   //RunSPCDataLoop();
   _spcProcessing.IsInSimulationMode = IsInSimulationMode;
   _spcProcessing.RunSPCDataLoop();
+  _serialPortExpander.RunSerialExpanderDataLoop();
+  
 
-  CheckSerialCommands();
+  //CheckSerialCommands();
 
   
-  delay(50);
+  //delay(10);
 }
 
 void CheckSerialCommands()

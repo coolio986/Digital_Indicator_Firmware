@@ -6,7 +6,7 @@
 */
 
 
-#include "spcProcessing.h"
+#include "SpcProcessing.h"
 #include <Arduino.h>
 #include "hardwareTypes.h"
 
@@ -23,74 +23,66 @@ void SpcProcessing::Setup(void)
   pinMode(req, OUTPUT);
   pinMode(clk, INPUT_PULLUP);
   pinMode(dat, INPUT_PULLUP);
-
+  
 
   digitalWrite(req, HIGH); // set request at high via transistor
 }
 
 void SpcProcessing::RunSPCDataLoop(void)
 {
+  currentMillis = millis();
 
-  if (IsInSimulationMode)
+  if (currentMillis >= (previousMillis + loopTime))
   {
-    PrintRandomDiameterData();
-    return;
-  }
-  
-  digitalWrite(req, HIGH); // generate set request
-
-
-  //currentMillis = millis();
-  for (int i = 0; i < 13; i++ )
-  {
+    if (IsInSimulationMode)
+    {
+      PrintRandomDiameterData();
+      return;
+    }
     
+    digitalWrite(req, HIGH); // generate set request
 
-    for (int j = 0; j < 4; j++)
+    int pinState = 0;
+    int lastPinState = 0;
+    for (int i = 0; i < 52;)
     {
-      //*****Edge from high to low*****//
-      uint32_t delayCounts = 0;
-      while ( digitalRead(clk) == HIGH)
-      {
-        delayCounts++;
-        if (delayCounts >= spcTimeDelay){ break;}
-        delayMicroseconds(1);
-      } // hold until clock is high
+      pinState = digitalRead(clk);
 
-      delayCounts = 0;
-      while ( digitalRead(clk) == LOW)
+      if (pinState != lastPinState)
       {
-        delayCounts++;
-        if (delayCounts >= spcTimeDelay){ break;}
-        delayMicroseconds(1);
-      } // hold until clock is low
-      //***************************//
-      
-      //bitWrite(k, j, (digitalRead(dat) & 0x1 )); // read data bits, and reverse order )
-      //Serial.print(digitalRead(dat));
-      dataStream += digitalRead(dat);
-
+        if (pinState == LOW)
+        {
+          dataStream += digitalRead(dat);
+          i++;
+        }
+      }
+      lastPinState = pinState;
     }
-  }
-  
-  bool dataStreamValid = false;
-  for (unsigned int i = 0; i < dataStream.length(); i++)
-  {
-    if (dataStream[i] == 0)
+
+    
+    bool dataStreamValid = false;
+    for (unsigned int i = 0; i < dataStream.length(); i++)
     {
-      dataStreamValid = true;
-      break;
+      if (dataStream[i] == '0')
+      {
+        dataStreamValid = true;
+        break;
+      }
     }
+    
+    
+    if (dataStreamValid)
+    {
+      Serial.print(INDICATOR);
+      Serial.print(";");
+      Serial.println(dataStream);
+    }
+    
+    dataStream = "";
+    digitalWrite(req, LOW);
+    previousMillis = currentMillis;
   }
   
-  if (dataStreamValid)
-  {
-    Serial.print(INDICATOR);
-    Serial.print(";");
-    Serial.println(dataStream);
-  }
-  
-  dataStream = "";
-  digitalWrite(req, LOW);
 }
 
 int SpcProcessing::PrintRandomDiameterData(void)
