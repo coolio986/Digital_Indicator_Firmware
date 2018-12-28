@@ -10,6 +10,7 @@
 #include "board.h"
 #include <Arduino.h>
 #include "serialProcessing.h"
+#include "DataConversions.h"
 
 
 // default constructor
@@ -24,10 +25,10 @@ void SerialPortExpander::Setup(void)
   pinMode(s2, OUTPUT);              //Set the digital pin as output
   pinMode(s3, OUTPUT);              //Set the digital pin as output
   Serial.begin(SERIAL_BAUD);               //Set the hardware serial port to 9600
-  Serial.setTimeout(5);
+  Serial.setTimeout(50);
   
   Serial1.begin(SERIAL_BAUD);
-  Serial1.setTimeout(20);
+  Serial1.setTimeout(50);
   
 }
 
@@ -58,13 +59,12 @@ void SerialPortExpander::RunSerialExpanderDataLoop(void)
     
     sensor_bytes_received = Serial1.readBytesUntil(13, sensordata, numberOfBufferBytes); //we read the data sent from the Atlas Scientific device until we see a <CR>. We also count how many character have been received
     sensordata[sensor_bytes_received] = 0;         //we add a 0 to the spot in the array just after the last character we received. This will stop us from transmitting incorrect data that may have been left in the buffer
+
+    char charBuilder[100];
     
-    Serial.print((port + 1));
-    Serial.print(";");
-    
-    char *serialData = CleanseData(sensordata);       //clense the data of unecessary newlines and reterminate
-    Serial.println(serialData);                       //let’s transmit the data received from the Atlas Scientific device to the serial monitor
-    
+    BUILD_SERIAL_OUTPUT((port + 1), CleanseData(sensordata), charBuilder);
+
+    Serial.println(charBuilder);            //let’s transmit the data received from the Atlas Scientific device to the serial monitor
   }
 
 

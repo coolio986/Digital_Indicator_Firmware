@@ -9,6 +9,7 @@
 #include "SpcProcessing.h"
 #include <Arduino.h>
 #include "hardwareTypes.h"
+#include "DataConversions.h"
 
 
 // default constructor
@@ -73,9 +74,11 @@ void SpcProcessing::RunSPCDataLoop(void)
     
     if (dataStreamValid)
     {
-      Serial.print(INDICATOR);
-      Serial.print(";");
-      Serial.println(dataStream);
+      char charBuilder[100];
+      
+      BUILD_SERIAL_OUTPUT(INDICATOR, dataStream.c_str(), charBuilder);
+
+      Serial.println(charBuilder);
     }
     
     dataStream = "";
