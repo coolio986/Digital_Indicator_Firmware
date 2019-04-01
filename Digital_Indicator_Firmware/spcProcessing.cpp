@@ -31,6 +31,8 @@ void SpcProcessing::Setup(void)
 
 void SpcProcessing::RunSPCDataLoop(void)
 {
+
+return;
   currentMillis = millis();
 
   if (currentMillis >= (previousMillis + loopTime))
@@ -109,3 +111,4 @@ int SpcProcessing::PrintRandomDiameterData(void)
 SpcProcessing::~SpcProcessing()
 {
 } //~spcProcessing
+

@@ -3,6 +3,7 @@
 
 /*End of auto generated code by Atmel studio */
 
+
 /*===========================================================
 * Project: Digital_Indicator_Firmware
 * Developled using Arduino v1.8.5
@@ -14,25 +15,38 @@
 * Version information:
 * v1.2 - beta
 * ===========================================================*/
-
+#include <Arduino_FreeRTOS.h>
 #include "serialProcessing.h"
 #include "hardwareTypes.h"
 #include "SpcProcessing.h"
 #include "SerialPortExpander.h"
+#include "SPI.h"
+#include "TFT_ILI9341.h"
+//Beginning of Auto generated function prototypes by Atmel Studio
+//End of Auto generated function prototypes by Atmel Studio
 
 
-#ifdef LEONARDO
-#include <SoftwareSerial.h>
+//Beginning of Auto generated function prototypes by Atmel Studio
+//End of Auto generated function prototypes by Atmel Studio
+
+
+
+
+
+
 //Beginning of Auto generated function prototypes by Atmel Studio
 void CheckSerialCommands();
 void RunSPCDataLoop();
 int CheckInteralCommands(char* code);
 int CheckSpoolerCommands(char* code);
 int PrintRandomDiameterData();
-int PrintRandomRPMData();
+void PrintRandomRPMData();
 bool startsWith(const char* pre, const char* str);
+void TaskCheckSPC( void *pvParameters );
+void TaskCheckSerialExpander( void *pvParameters );
+void TaskRunScreen( void *pvParameters );
 //End of Auto generated function prototypes by Atmel Studio
-#endif
+
 
 
 
@@ -40,10 +54,14 @@ bool startsWith(const char* pre, const char* str);
 //int dat = 2; //mic Data line goes to pin 2
 //int clk = 0; //mic Clock line goes to pin 3
 
+// These are used to get information about static SRAM and flash memory sizes
+extern "C" char __data_start[];    // start of SRAM data
+extern "C" char _end[];     // end of SRAM data (used to check amount of SRAM this program's variables use)
+extern "C" char __data_load_end[];  // end of FLASH (used to check amount of Flash this program's code and data uses)
 
-//****SoftwareSerial1 port pins****//
-#define SS1_RX 8
-#define SS1_TX 9
+// Use hardware SPI
+TFT_ILI9341 tft = TFT_ILI9341();
+
 
 bool IsInSimulationMode;
 
@@ -58,14 +76,44 @@ serialCommand sCommand;
 SpcProcessing _spcProcessing;
 SerialPortExpander _serialPortExpander;
 
+
+
 void setup()
 {
-  //Serial.begin(SERIAL_BAUD);
+  Serial.begin(SERIAL_BAUD);
   //HWSERIAL.begin(SERIAL_BAUD);
   //HWSERIAL.setTimeout(100);
   
   _spcProcessing.Setup();
   _serialPortExpander.Setup();
+  tft.init();
+  tft.fillScreen(TFT_BLACK);
+  tft.setRotation(3);
+
+  xTaskCreate(
+  TaskCheckSPC
+  ,  (const portCHAR *)"CheckSPC"   // A name just for humans
+  ,  500  // This stack size can be checked & adjusted by reading the Stack Highwater
+  ,  NULL
+  ,   2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+  ,  NULL );
+//
+  xTaskCreate(
+  TaskCheckSerialExpander
+  ,  (const portCHAR *)"CheckSerialExpander"   // A name just for humans
+  ,  500  // This stack size can be checked & adjusted by reading the Stack Highwater
+  ,  NULL
+  ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+  ,  NULL );
+
+  xTaskCreate(
+  TaskRunScreen
+  ,  (const portCHAR *)"RunScreen"   // A name just for humans
+  ,  500  // This stack size can be checked & adjusted by reading the Stack Highwater
+  ,  NULL
+  ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+  ,  NULL );
+
 
   
 }
@@ -74,8 +122,8 @@ void loop()
 {
   //RunSPCDataLoop();
   _spcProcessing.IsInSimulationMode = IsInSimulationMode;
-  _spcProcessing.RunSPCDataLoop();
-  _serialPortExpander.RunSerialExpanderDataLoop();
+  
+  
   
 
   //CheckSerialCommands();
@@ -83,6 +131,58 @@ void loop()
   
   //delay(10);
 }
+
+void TaskCheckSPC(void *pvParameters)  // This is a task.
+{
+  (void) pvParameters;
+  
+  
+  for (;;) // A Task shall never return or exit.
+  {
+    _spcProcessing.RunSPCDataLoop();
+    vTaskDelay( 50 / portTICK_PERIOD_MS); // wait for one second
+     
+     
+  }
+
+}
+
+void TaskCheckSerialExpander(void *pvParameters)  // This is a task.
+{
+  (void) pvParameters;
+  
+  for (;;) // A Task shall never return or exit.
+  {
+    _serialPortExpander.RunSerialExpanderDataLoop();
+    vTaskDelay( 100 / portTICK_PERIOD_MS ); // wait for one second
+  }
+
+}
+
+void TaskRunScreen(void *pvParameters)  // This is a task.
+{
+  (void) pvParameters;
+  UBaseType_t uxHighWaterMark;
+  int i = 0;
+  
+  for (;;) // A Task shall never return or exit.
+  {
+    tft.setTextColor(TFT_GREEN, TFT_BLACK);
+    //tft.setTextColor(TFT_GREEN);
+    tft.setTextSize(3);
+    tft.setCursor(0, 0);
+    tft.print(F("Diameter: 1.7"));
+    i = i>9 ? 0 : i;
+    tft.println(i++);
+    vTaskDelay( 50 / portTICK_PERIOD_MS  ); // wait for one second
+    
+    
+    uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+  }
+
+}
+
+
 
 void CheckSerialCommands()
 {
@@ -149,70 +249,7 @@ void CheckSerialCommands()
   }
 }
 
-//void RunSPCDataLoop()
-//{
-//
-  //if (IsInSimulationMode)
-  //{
-    //PrintRandomDiameterData();
-  //}
-  //else
-  //{
-    //digitalWrite(req, HIGH); // generate set request
-//
-//
-    ////currentMillis = millis();
-    //for (int i = 0; i < 13; i++ )
-    //{
-      //
-//
-      //for (int j = 0; j < 4; j++)
-      //{
-        ////*****Edge from high to low*****//
-        //uint32_t delayCounts = 0;
-        //while ( digitalRead(clk) == HIGH)
-        //{
-          //delayCounts++;
-          //if (delayCounts >= spcTimeDelay){ break;}
-          //delayMicroseconds(1);
-        //} // hold until clock is high
-//
-        //delayCounts = 0;
-        //while ( digitalRead(clk) == LOW)
-        //{
-          //delayCounts++;
-          //if (delayCounts >= spcTimeDelay){ break;}
-          //delayMicroseconds(1);
-        //} // hold until clock is low
-        ////***************************//
-        //
-        ////bitWrite(k, j, (digitalRead(dat) & 0x1 )); // read data bits, and reverse order )
-        ////Serial.print(digitalRead(dat));
-        //dataStream += digitalRead(dat);
-//
-      //}
-    //}
-    //
-    //bool dataStreamValid = false;
-    //for (unsigned int i = 0; i < dataStream.length(); i++)
-    //{
-      //if (dataStream[i] == 0)
-      //{
-        //dataStreamValid = true;
-        //break;
-      //}
-    //}
-    //
-    //if (dataStreamValid)
-    //{
-      //Serial.print("3;");
-      //Serial.println(dataStream);
-    //}
-    //
-    //dataStream = "";
-    //digitalWrite(req, LOW);
-  //}
-//}
+
 
 int CheckInteralCommands(char *code)
 {
@@ -248,7 +285,7 @@ int CheckSpoolerCommands(char *code)
 
 
 
-int PrintRandomRPMData()
+void PrintRandomRPMData()
 {
   long rpm = random(10, 15);
 
@@ -264,3 +301,6 @@ bool startsWith(const char *pre, const char *str)
   lenstr = strlen(str);
   return lenstr < lenpre ? false : strncmp(pre, str, lenpre) == 0;
 }
+
+
+

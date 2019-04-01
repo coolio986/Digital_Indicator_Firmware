@@ -36,10 +36,14 @@ void SerialPortExpander::RunSerialExpanderDataLoop(void)
 {
   if (Serial.available() > 0)
   {
-  
+    
     computer_bytes_received = Serial.readBytesUntil(13, computerdata, numberOfBufferBytes); //We read the data sent from the serial monitor(pc/mac/other) until we see a <CR>. We also count how many characters have been received
     computerdata[computer_bytes_received] = 0; //We add a 0 to the spot in the array just after the last character we received.. This will stop us from transmitting incorrect data that may have been left in the buffer
     
+  }
+  else
+  {
+    return;
   }
   if (computer_bytes_received != 0) {             //If computer_bytes_received does not equal zero
     channel = strtok(computerdata, ";");          //Let's parse the string at each colon
@@ -70,7 +74,7 @@ void SerialPortExpander::RunSerialExpanderDataLoop(void)
 
 }
 
-void SerialPortExpander::Open_channel(void) 
+void SerialPortExpander::Open_channel(void)
 {                             //This function controls what UART port is opened.
 
   port = atoi(channel);                           //Convert the ASCII char value of the port to be opened into an int
@@ -88,3 +92,5 @@ void SerialPortExpander::Open_channel(void)
 SerialPortExpander::~SerialPortExpander()
 {
 } //~SerialPortExpander
+
+
