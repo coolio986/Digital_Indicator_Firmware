@@ -10,7 +10,8 @@
 #define __SERIALPORTEXPANDER_H__
 
 #include <Arduino.h>
-#include "SerialProcessing.h"
+
+#include "SerialCommand.h"
 
 class SerialPortExpander
 {

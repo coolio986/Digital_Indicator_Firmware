@@ -46,7 +46,7 @@ C_SRCS +=  \
 ../Fonts/glcdfont.c \
 ../Screen.cpp \
 ../SerialPortExpander.cpp \
-../serialProcessing.cpp \
+../SerialProcessing.cpp \
 ../Sketch.cpp \
 ../SpcProcessing.cpp \
 ../TFT_ILI9341.cpp
@@ -67,7 +67,7 @@ Fonts/Font7srle.o \
 Fonts/glcdfont.o \
 Screen.o \
 SerialPortExpander.o \
-serialProcessing.o \
+SerialProcessing.o \
 Sketch.o \
 SpcProcessing.o \
 TFT_ILI9341.o
@@ -81,7 +81,7 @@ Fonts/Font7srle.o \
 Fonts/glcdfont.o \
 Screen.o \
 SerialPortExpander.o \
-serialProcessing.o \
+SerialProcessing.o \
 Sketch.o \
 SpcProcessing.o \
 TFT_ILI9341.o
@@ -95,7 +95,7 @@ Fonts/Font7srle.d \
 Fonts/glcdfont.d \
 Screen.d \
 SerialPortExpander.d \
-serialProcessing.d \
+SerialProcessing.d \
 Sketch.d \
 SpcProcessing.d \
 TFT_ILI9341.d
@@ -109,7 +109,7 @@ Fonts/Font7srle.d \
 Fonts/glcdfont.d \
 Screen.d \
 SerialPortExpander.d \
-serialProcessing.d \
+SerialProcessing.d \
 Sketch.d \
 SpcProcessing.d \
 TFT_ILI9341.d
@@ -185,7 +185,7 @@ Fonts/glcdfont.o: ../Fonts/glcdfont.c
 	@echo Finished building: $<
 	
 
-./serialProcessing.o: .././serialProcessing.cpp
+./SerialProcessing.o: .././SerialProcessing.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 5.4.0
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=16000000L -DARDUINO= -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR -DUSB_VID=0x2341 -DUSB_PID=0x0010 -DUSB_MANUFACTURER="\"Arduino LLC\""  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\include" -I"..\\..\ArduinoCore\include" -I"..\\..\ArduinoCore\include\core" -I"..\\..\ArduinoCore\include\Fonts" -I"..\\..\ArduinoCore\include\libraries\FreeRTOS" -I"..\\..\ArduinoCore\include\libraries\SPI" -I"..\\..\ArduinoCore\include\variants\mega"  -O0 -fno-threadsafe-statics -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -w -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\gcc\dev\atmega2560" -c -std=gnu++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

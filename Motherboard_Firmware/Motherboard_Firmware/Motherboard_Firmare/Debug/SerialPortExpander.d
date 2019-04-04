@@ -35,8 +35,9 @@ SerialPortExpander.d SerialPortExpander.o: .././SerialPortExpander.cpp \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
  ..\\..\ArduinoCore\include\core/Arduino.h \
  ..\\..\ArduinoCore\include\variants\mega/pins_arduino.h \
- .././SerialProcessing.h .././board.h .././hardwareTypes.h \
- .././serialProcessing.h .././DataConversions.h
+ .././SerialCommand.h .././board.h .././DataConversions.h \
+ .././SerialProcessing.h .././hardwareTypes.h .././Device_Configuration.h \
+ .././HardwareTypes.h
 
 .././SerialPortExpander.h:
 
@@ -112,12 +113,16 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 
 ..\\..\ArduinoCore\include\variants\mega/pins_arduino.h:
 
-.././SerialProcessing.h:
+.././SerialCommand.h:
 
 .././board.h:
 
+.././DataConversions.h:
+
+.././SerialProcessing.h:
+
 .././hardwareTypes.h:
 
-.././serialProcessing.h:
+.././Device_Configuration.h:
 
-.././DataConversions.h:
+.././HardwareTypes.h:

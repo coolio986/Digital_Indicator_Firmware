@@ -1,5 +1,5 @@
 SerialProcessing.d SerialProcessing.o: .././SerialProcessing.cpp \
- .././serialProcessing.h ..\\..\ArduinoCore\include\core/Arduino.h \
+ .././SerialProcessing.h ..\\..\ArduinoCore\include\core/Arduino.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdbool.h \
@@ -35,9 +35,10 @@ SerialProcessing.d SerialProcessing.o: .././SerialProcessing.cpp \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
  ..\\..\ArduinoCore\include\core/Arduino.h \
  ..\\..\ArduinoCore\include\variants\mega/pins_arduino.h .././board.h \
- .././hardwareTypes.h .././DataConversions.h .././SerialProcessing.h
+ .././hardwareTypes.h .././SerialCommand.h .././Device_Configuration.h \
+ .././HardwareTypes.h .././DataConversions.h .././SerialPortExpander.h
 
-.././serialProcessing.h:
+.././SerialProcessing.h:
 
 ..\\..\ArduinoCore\include\core/Arduino.h:
 
@@ -115,6 +116,12 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 
 .././hardwareTypes.h:
 
+.././SerialCommand.h:
+
+.././Device_Configuration.h:
+
+.././HardwareTypes.h:
+
 .././DataConversions.h:
 
-.././SerialProcessing.h:
+.././SerialPortExpander.h:

@@ -22,6 +22,6 @@
 #define ADC_MIN_VALUE 0
 #define ADC_MAX_VALUE 1023 //zero based
 
-extern bool SIMULATIONACTIVE = true;
+extern bool SIMULATIONACTIVE;
 
 #endif //__DEVICE_CONFIGURATION_H__

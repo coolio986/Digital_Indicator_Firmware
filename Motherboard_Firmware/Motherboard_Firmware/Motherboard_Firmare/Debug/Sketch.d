@@ -47,8 +47,8 @@ Sketch.d Sketch.o: .././Sketch.cpp \
  ..\\..\ArduinoCore\include\libraries\FreeRTOS/task.h \
  ..\\..\ArduinoCore\include\libraries\FreeRTOS/list.h \
  .././SerialProcessing.h .././board.h .././hardwareTypes.h \
- .././SpcProcessing.h .././SerialPortExpander.h .././Screen.h \
- .././Device_Configuration.h .././HardwareTypes.h
+ .././SerialCommand.h .././Device_Configuration.h .././HardwareTypes.h \
+ .././SpcProcessing.h .././Screen.h
 
 ..\\..\ArduinoCore\include\core/Arduino.h:
 
@@ -150,12 +150,12 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 
 .././hardwareTypes.h:
 
-.././SpcProcessing.h:
-
-.././SerialPortExpander.h:
-
-.././Screen.h:
+.././SerialCommand.h:
 
 .././Device_Configuration.h:
 
 .././HardwareTypes.h:
+
+.././SpcProcessing.h:
+
+.././Screen.h:

@@ -289,16 +289,19 @@
     <Compile Include="Screen.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="SerialCommand.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="SerialPortExpander.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="SerialPortExpander.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="serialProcessing.cpp">
+    <Compile Include="SerialProcessing.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="serialProcessing.h">
+    <Compile Include="SerialProcessing.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Sketch.cpp">

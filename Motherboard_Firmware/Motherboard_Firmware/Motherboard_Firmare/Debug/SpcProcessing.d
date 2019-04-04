@@ -35,7 +35,8 @@ SpcProcessing.d SpcProcessing.o: .././SpcProcessing.cpp \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
  ..\\..\ArduinoCore\include\core/Arduino.h \
  ..\\..\ArduinoCore\include\variants\mega/pins_arduino.h .././board.h \
- .././hardwareTypes.h .././DataConversions.h .././SerialProcessing.h
+ .././hardwareTypes.h .././DataConversions.h .././SerialProcessing.h \
+ .././SerialCommand.h .././Device_Configuration.h .././HardwareTypes.h
 
 .././SpcProcessing.h:
 
@@ -118,3 +119,9 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 .././DataConversions.h:
 
 .././SerialProcessing.h:
+
+.././SerialCommand.h:
+
+.././Device_Configuration.h:
+
+.././HardwareTypes.h:

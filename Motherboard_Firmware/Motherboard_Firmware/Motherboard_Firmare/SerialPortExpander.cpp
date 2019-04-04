@@ -9,9 +9,8 @@
 #include "SerialPortExpander.h"
 #include "board.h"
 #include <Arduino.h>
-#include "serialProcessing.h"
 #include "DataConversions.h"
-#include "SerialProcessing.h"
+#include "SerialCommand.h"
 
 SerialPortExpander *SerialPortExpander::firstInstance;
 

@@ -18,7 +18,7 @@ Screen.cpp
 
 SerialPortExpander.cpp
 
-serialProcessing.cpp
+SerialProcessing.cpp
 
 Sketch.cpp
 

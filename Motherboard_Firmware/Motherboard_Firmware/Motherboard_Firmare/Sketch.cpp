@@ -15,17 +15,11 @@
 #include "SerialProcessing.h"
 #include "hardwareTypes.h"
 #include "SpcProcessing.h"
-#include "SerialPortExpander.h"
 #include "Screen.h"
 #include "Device_Configuration.h"
 
-
-
-
 #define INCLUDE_vTaskDelay   1
 #define configUSE_PREEMPTION 1
-
-
 
 //Beginning of Auto generated function prototypes by Atmel Studio
 void CheckSerialCommands();
@@ -42,9 +36,6 @@ void TaskCheckSerialCommands( void *pvParameters );
 void TaskRunSimulation(void *pvParameters );
 //End of Auto generated function prototypes by Atmel Studio
 
-
-
-
 //int req = 3; //mic REQ line goes to pin 5 through q1 (arduino high pulls request line low)
 //int dat = 2; //mic Data line goes to pin 2
 //int clk = 0; //mic Clock line goes to pin 3
@@ -55,14 +46,13 @@ extern "C" char _end[];     // end of SRAM data (used to check amount of SRAM th
 extern "C" char __data_load_end[];  // end of FLASH (used to check amount of Flash this program's code and data uses)
 
 
+bool SIMULATIONACTIVE = true; //sets default value for simulation
 
-bool SIMULATIONMODE = true; //sets default value for simulation
-bool IsInSimulationMode;
 
 SerialCommand sCommand;
 SpcProcessing spcProcessing;
-SerialPortExpander serialPortExpander;
 Screen screen;
+SerialProcessing serialProcessing;
 
 
 
@@ -72,11 +62,8 @@ void setup()
 	
 	
 	spcProcessing.init();
-	serialPortExpander.init();
 	screen.init();
-
-	IsInSimulationMode = SIMULATIONMODE;
-	
+	serialProcessing.init();
 
 	xTaskCreate(
 	TaskCheckSPC
@@ -158,7 +145,8 @@ void TaskCheckSerialCommands(void *pvParameters)  // This is a task.
 	
 	for (;;) // A Task shall never return or exit.
 	{
-		CheckSerialCommands();
+		//CheckSerialCommands();
+		serialProcessing.CheckSerialCommands();
 		vTaskDelay( 100 / portTICK_PERIOD_MS ); // wait for one second
 	}
 
@@ -172,7 +160,7 @@ void TaskRunScreen(void *pvParameters)  // This is a task.
 	
 	for (;;) // A Task shall never return or exit.
 	{
-		screen.IsInSimulationMode = IsInSimulationMode;
+		screen.IsInSimulationMode = SIMULATIONACTIVE;
 		screen.UpdateScreen();
 		
 		uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
@@ -184,114 +172,10 @@ void TaskRunSimulation(void *pvParameters)  // This is a task.
 {
 	for (;;) // A Task shall never return or exit.
 	{
-		if (spcProcessing.IsInSimulationMode != IsInSimulationMode)
+		if (spcProcessing.IsInSimulationMode != SIMULATIONACTIVE)
 		{
-			spcProcessing.IsInSimulationMode = IsInSimulationMode;
+			spcProcessing.IsInSimulationMode = SIMULATIONACTIVE;
 		}
 		vTaskDelay( 50 / portTICK_PERIOD_MS  ); // wait for one second
 	}
 }
-
-
-void CheckSerialCommands()
-{
-	
-	if (Serial.available() > 0 )
-	{
-		
-		char *usbData = CheckSerial(&Serial);
-		sCommand = GetSerialArgs(usbData);
-		
-
-		if(sCommand.hardwareType == hardwareType.internal)
-		{
-			CheckInteralCommands(sCommand.command);
-		}
-
-		if(sCommand.hardwareType == hardwareType.spooler)
-		{
-			CheckSpoolerCommands(sCommand.command);
-		}
-
-		if((sCommand.hardwareType > hardwareType.indicator) && (sCommand.hardwareType < hardwareType.internal))
-		{
-			//serialPortExpander.channel
-			serialPortExpander.ProcessSerialExpander(&sCommand);
-		}
-
-		
-
-		
-		
-
-		if (!IsInSimulationMode)
-		{
-			
-			char * serialData = CheckSerial(&Serial);
-			if (strlen(serialData) > 1)
-			{
-				Serial.print(sCommand.hardwareType);
-				Serial.print(";");
-				Serial.print(sCommand.command);
-				Serial.println(";");
-			}
-		}
-	}
-
-	if (Serial1.available() > 0)
-	{
-		
-	}
-
-}
-
-
-
-int CheckInteralCommands(char *code)
-{
-	//Serial.println("sim mode routine");
-	if (strcmp(sCommand.command, "IsInSimulationMode") == 0)
-	{
-		
-		IsInSimulationMode = strcmp(sCommand.value, "true") == 0;
-	}
-	
-	return 0;
-}
-
-int CheckSpoolerCommands(char *code)
-{
-	
-	if (IsInSimulationMode){
-		if (startsWith("getrpm", code))
-		{
-			PrintRandomRPMData();
-		}
-	}
-	else
-	{
-		Serial.println(code);
-	}
-	return 0;
-}
-
-
-
-void PrintRandomRPMData()
-{
-	long rpm = random(10, 15);
-
-	Serial.print(hardwareType.spooler);
-	Serial.print(";getrpm = ");
-	Serial.print(rpm);
-	Serial.println(";");
-}
-
-bool startsWith(const char *pre, const char *str)
-{
-	size_t lenpre = strlen(pre),
-	lenstr = strlen(str);
-	return lenstr < lenpre ? false : strncmp(pre, str, lenpre) == 0;
-}
-
-
