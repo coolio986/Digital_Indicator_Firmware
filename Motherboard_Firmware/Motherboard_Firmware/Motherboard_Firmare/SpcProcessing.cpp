@@ -34,78 +34,126 @@ void SpcProcessing::init(void)
 	
 
 	digitalWrite(req, HIGH); // set request at high via transistor needed for default state
+
+
+
+
 }
 
 void SpcProcessing::RunSPCDataLoop(void)
 {
-	currentMillis = millis();
-	int maxRetries = 5;
-
-
-	if (currentMillis >= (previousMillis + loopTime))
+	char rawSPC[100] = {0};
+	
+	if (IsInSimulationMode)
 	{
-		if (IsInSimulationMode)
-		{
-			PrintRandomDiameterData();
-			return;
-		}
-		
-		digitalWrite(req, HIGH); // generate set request
-
-		int pinState = 0;
-		int lastPinState = 0;
-		for (int i = 0; i < 52;)
-		{
-			
-			pinState = digitalRead(clk);
-
-			if (pinState != lastPinState)
-			{
-				if (pinState == LOW)
-				{
-					dataStream += digitalRead(dat);
-					i++;
-				}
-			}
-			else
-			{
-				maxRetries--;
-			}
-			
-			if (maxRetries <= 0){return;}
-
-			lastPinState = pinState;
-		}
-
-		
-		bool dataStreamValid = false;
-		for (unsigned int i = 0; i < dataStream.length(); i++)
-		{
-			if (dataStream[i] == '0')
-			{
-				dataStreamValid = true;
-				break;
-			}
-		}
-		
-		
-		if (dataStreamValid)
-		{
-			char charBuilder[100];
-			SerialCommand sCommand;
-			sCommand.hardwareType = INDICATOR;
-			strcpy (sCommand.command, dataStream.c_str());
-			BuildSerialOutput(&sCommand, charBuilder);
-			//BUILD_SERIAL_OUTPUT(INDICATOR, dataStream.c_str(), charBuilder);
-			//BUILD_SERIAL_OUTPUT(sCommand, charBuilder);
-
-			Serial.println(charBuilder);
-		}
-		
-		dataStream = "";
-		digitalWrite(req, LOW);
-		previousMillis = currentMillis;
+		PrintRandomDiameterData();
+		return;
 	}
+
+	PORTA |= digitalPinToBitMask(req); //generate set request
+	
+	
+	int pinState = 0;
+	int lastPinState = 0;
+	int loopCount = 0;
+
+	for (int i = 0; i < 52;)
+	{
+		pinState = !(PINA & digitalPinToBitMask(clk)) == 0;
+
+		if (pinState != lastPinState)
+		{
+			if (pinState == LOW)
+			{
+				rawSPC[i] = (PINA & digitalPinToBitMask(dat)) == 0 ? 48 : 49;
+				i++;
+			}
+		}
+		
+		loopCount++;
+
+		if (loopCount >= 15000){
+
+			SerialCommand sError;
+			sError.hardwareType = INDICATOR;
+			sError.command = "INDICATOR";
+			sError.value = "INDICATOR HAS BEEN DISCONNECTED";
+			char sErrorOutput [MAX_CMD_LENGTH] = {0};
+			BuildSerialOutput(&sError, sErrorOutput);
+			Serial.println(sErrorOutput);
+			return; //kicks out the loop if the SPC gets disconnected or has an error
+		}
+		
+		lastPinState = pinState;
+	}
+
+	bool dataStreamValid = false;
+	for (unsigned int i = 0; i < 12; i++)
+	{
+		if (rawSPC[i] == 48) //48 is 0 (zero) in ascii
+		{
+			dataStreamValid = false;
+			Serial.println("SPC serial error occurred");
+			break;
+		}
+		else {dataStreamValid = true;}
+	}
+	
+	if (dataStreamValid)
+	{
+
+		
+		//Serial.println(rawSPC);
+
+
+
+		byte bytes[13] = {0};
+		for (int i = 0; i < 13; i++)
+		{
+			int idx = (i*4) + 4;
+			int bitPointer = 0;
+			for (int j = i * 4; j < idx ; j++)
+			{
+				bitWrite(bytes[i], bitPointer, rawSPC[j] == 49); //49 ascii for 1
+				bitPointer++;
+			}
+		}
+
+		float preDecimalNumber = 0.0;
+		char buf[7];
+
+		for(int i=0;i<6;i++){ //grab array positions 5-10
+			
+			buf[i]=bytes[i+5]+'0';
+			
+			buf[6]=0;
+			
+			preDecimalNumber=atol(buf); //assembled measurement, no decimal place added
+		}
+
+		int decimalPointLocation = bytes[11];
+
+		SPCDiameter = preDecimalNumber / (pow(10, decimalPointLocation));
+
+		//Serial.println(number/(pow(10, decimalPointLocation)), decimalPointLocation); //add decimal;
+		
+		char outputBuffer[MAX_CMD_LENGTH] = {0};
+		
+
+		char decimalNumber[10] = {0};
+		CONVERT_FLOAT_TO_STRING(SPCDiameter, decimalNumber);
+		
+		SerialCommand sCommand;
+		sCommand.hardwareType = INDICATOR;
+		sCommand.command = "INDICATOR";
+		sCommand.value = decimalNumber;
+		
+		BuildSerialOutput(&sCommand, outputBuffer);
+		Serial.println(outputBuffer);
+		
+	}
+	
+
 	
 }
 
@@ -126,7 +174,15 @@ int SpcProcessing::PrintRandomDiameterData(void)
 	return 0;
 }
 
+float SpcProcessing::GetDiameter(void){
+
+	return SPCDiameter;
+}
+
+
 // default destructor
 SpcProcessing::~SpcProcessing()
 {
 } //~spcProcessing
+
+

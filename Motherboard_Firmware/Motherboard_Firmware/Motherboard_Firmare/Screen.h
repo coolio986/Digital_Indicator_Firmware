@@ -19,19 +19,21 @@ public:
 	bool IsInSimulationMode;
 protected:
 private:
+	float SPCDiameter;
 
 //functions
 public:
 	Screen();
 	~Screen();
 	void init();
-	void UpdateScreen();
+	void UpdateScreen(float diameter);
 protected:
 private:
 	Screen( const Screen &c );
 	Screen& operator=( const Screen &c );
 	static Screen *firstInstance;
 	void RunScreenSimulation();
+	
 
 }; //Screen
 

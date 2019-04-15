@@ -28,6 +28,7 @@ class SpcProcessing
 	  uint32_t currentMillis = 0;
 	  uint32_t previousMillis = 0;
 	  String dataStream;
+	  bool lock = false;
 
   //functions
   public:
@@ -35,6 +36,7 @@ class SpcProcessing
 	  ~SpcProcessing();
 	  void RunSPCDataLoop(void);
 	  void init(void);
+	  float GetDiameter(void);
   
   protected:
   
@@ -43,7 +45,7 @@ class SpcProcessing
 	  SpcProcessing( const SpcProcessing &c );
 	  SpcProcessing& operator=( const SpcProcessing &c );
 	  int PrintRandomDiameterData(void);
-
+	  float SPCDiameter;
 }; //spcProcessing
 
 #endif //__SPCPROCESSING_H__
