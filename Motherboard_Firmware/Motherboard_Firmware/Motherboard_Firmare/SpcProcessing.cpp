@@ -31,18 +31,13 @@ void SpcProcessing::init(void)
 	pinMode(req, OUTPUT);
 	pinMode(clk, INPUT_PULLUP);
 	pinMode(dat, INPUT_PULLUP);
-	
 
 	digitalWrite(req, HIGH); // set request at high via transistor needed for default state
-
-
-
-
 }
 
 void SpcProcessing::RunSPCDataLoop(void)
 {
-	char rawSPC[100] = {0};
+	
 	
 	if (IsInSimulationMode)
 	{
@@ -52,7 +47,7 @@ void SpcProcessing::RunSPCDataLoop(void)
 
 	PORTA |= digitalPinToBitMask(req); //generate set request
 	
-	
+	char rawSPC[53] = {0};
 	int pinState = 0;
 	int lastPinState = 0;
 	int loopCount = 0;
@@ -93,7 +88,15 @@ void SpcProcessing::RunSPCDataLoop(void)
 		if (rawSPC[i] == 48) //48 is 0 (zero) in ascii
 		{
 			dataStreamValid = false;
-			Serial.println("SPC serial error occurred");
+
+			SerialCommand sError;
+			sError.hardwareType = INDICATOR;
+			sError.command = "INDICATOR";
+			sError.value = "A SPC PROCESSING ERROR HAS OCCURRED";
+			char sErrorOutput [MAX_CMD_LENGTH] = {0};
+			BuildSerialOutput(&sError, sErrorOutput);
+			Serial.println(sErrorOutput);
+			
 			break;
 		}
 		else {dataStreamValid = true;}
@@ -101,12 +104,6 @@ void SpcProcessing::RunSPCDataLoop(void)
 	
 	if (dataStreamValid)
 	{
-
-		
-		//Serial.println(rawSPC);
-
-
-
 		byte bytes[13] = {0};
 		for (int i = 0; i < 13; i++)
 		{
@@ -114,7 +111,7 @@ void SpcProcessing::RunSPCDataLoop(void)
 			int bitPointer = 0;
 			for (int j = i * 4; j < idx ; j++)
 			{
-				bitWrite(bytes[i], bitPointer, rawSPC[j] == 49); //49 ascii for 1
+				bitWrite(bytes[i], bitPointer, rawSPC[j] == 49); //49 ascii for 1 //grab nibbles from rawSPC
 				bitPointer++;
 			}
 		}
@@ -122,7 +119,7 @@ void SpcProcessing::RunSPCDataLoop(void)
 		float preDecimalNumber = 0.0;
 		char buf[7];
 
-		for(int i=0;i<6;i++){ //grab array positions 5-10
+		for(int i=0;i<6;i++){ //grab array positions 5-10 for diameter numbers
 			
 			buf[i]=bytes[i+5]+'0';
 			
@@ -133,12 +130,9 @@ void SpcProcessing::RunSPCDataLoop(void)
 
 		int decimalPointLocation = bytes[11];
 
-		SPCDiameter = preDecimalNumber / (pow(10, decimalPointLocation));
+		SPCDiameter = preDecimalNumber / (pow(10, decimalPointLocation)); //add decimal to number
 
-		//Serial.println(number/(pow(10, decimalPointLocation)), decimalPointLocation); //add decimal;
-		
 		char outputBuffer[MAX_CMD_LENGTH] = {0};
-		
 
 		char decimalNumber[10] = {0};
 		CONVERT_FLOAT_TO_STRING(SPCDiameter, decimalNumber);
