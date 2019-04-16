@@ -69,3 +69,5 @@ Motherboard_Firmware/Motherboard_Firmware/Motherboard_Firmare/Debug/Motherboard_
 *.elf
 *.hex
 *.lss
+*.d
+*.eep
