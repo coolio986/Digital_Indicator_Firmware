@@ -64,3 +64,8 @@ Motherboard_Firmware/Motherboard_Firmware/Motherboard_Firmare/Debug/Sketch.o
 Motherboard_Firmware/Motherboard_Firmware/Motherboard_Firmare/Debug/SpcProcessing.o
 Motherboard_Firmware/Motherboard_Firmware/Motherboard_Firmare/Debug/TFT_ILI9341.o
 Motherboard_Firmware/Motherboard_Firmware/Motherboard_Firmare/Debug/Motherboard_Firmware.elf
+*.a
+*.o
+*.elf
+*.hex
+*.lss
