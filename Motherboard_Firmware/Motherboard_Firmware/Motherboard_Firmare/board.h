@@ -7,7 +7,7 @@
 
 #define INDICATOR_REQ  30
 #define INDICATOR_DAT  28
-#define INDICATOR_CLK  29
+#define INDICATOR_CLK  2//29
 
 #endif//__BOARD_H__
 

@@ -43,7 +43,7 @@ void SerialPortExpander::ProcessSerialExpander(SerialCommand *sCommand)
 	Open_channel(sCommand);
 	//Serial.print(sCommand->hardwareType ";");
 
-	char charBuilder[100];
+	char charBuilder[MAX_CMD_LENGTH];
 	
 	//BUILD_SERIAL_OUTPUT(sCommand->hardwareType, sCommand->command, charBuilder);
 	BuildSerialOutput(sCommand, charBuilder);
