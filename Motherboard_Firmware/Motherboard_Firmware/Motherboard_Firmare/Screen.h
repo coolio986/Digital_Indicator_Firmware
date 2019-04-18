@@ -9,25 +9,41 @@
 #ifndef __SCREEN_H__
 #define __SCREEN_H__
 #include <Arduino.h>
+#include "Error.h"
 
 
 class Screen
 {
-//variables
+//******variables******//
 public:
-	
 	bool IsInSimulationMode;
+
 protected:
+
 private:
 	float SPCDiameter;
+	Error errors[10];
 
-//functions
+
+
+
+
+
+
+
+
+//*******functions******//
 public:
 	Screen();
 	~Screen();
 	void init();
 	void UpdateScreen(float diameter);
+	void DisplayError(Error *eError);
+	void ClearError(void);
+	void AddError(Error *eError);
+
 protected:
+
 private:
 	Screen( const Screen &c );
 	Screen& operator=( const Screen &c );

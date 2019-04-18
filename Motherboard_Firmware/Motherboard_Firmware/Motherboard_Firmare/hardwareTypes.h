@@ -10,10 +10,11 @@
 #define __HARDWARETYPES_H__
 
 const int INDICATOR = 0; //indicator
-const int SPOOLER = 1; //spooler
+const int SPOOLER = 1; //spooler stepper
 const int EXTRUDER = 2; //extruder
 const int TRAVERSE = 3; //traverse
 const int INTERNALDEVICE = 100;
+const int ERROR = 101;
 
 typedef struct{
 	uint16_t indicator; //indicator
@@ -21,6 +22,7 @@ typedef struct{
 	uint16_t extruder; //extruder
 	uint16_t traverse; //traverse
 	uint16_t internal; //internal
+	uint16_t error; //error
 } struct_hardwareTypes;
 
 const static struct_hardwareTypes hardwareType =
@@ -30,7 +32,8 @@ const static struct_hardwareTypes hardwareType =
 	.spooler = SPOOLER,
 	.extruder = EXTRUDER,
 	.traverse = TRAVERSE,
-	.internal = INTERNALDEVICE
+	.internal = INTERNALDEVICE,
+	.error = ERROR
 };
 
 static uint16_t int_hardwareTypes[] =
@@ -42,6 +45,7 @@ static uint16_t int_hardwareTypes[] =
 	EXTRUDER, //2 = extruder
 	TRAVERSE, //3 = traverse
 	INTERNALDEVICE, // 100 = internal
+	ERROR,	//101 = Error
 };
 
 

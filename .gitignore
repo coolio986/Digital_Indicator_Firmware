@@ -71,3 +71,6 @@ Motherboard_Firmware/Motherboard_Firmware/Motherboard_Firmare/Debug/Motherboard_
 *.lss
 *.d
 *.eep
+Motherboard_Firmware/Motherboard_Firmware/Motherboard_Firmare/Debug/Makefile
+Motherboard_Firmware/Motherboard_Firmware/Motherboard_Firmare/Motherboard_Firmware.cppproj
+Motherboard_Firmware/.vs/Motherboard_Firmware/v14/.atsuo

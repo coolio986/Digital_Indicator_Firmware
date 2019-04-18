@@ -38,10 +38,6 @@ void TaskRunSimulation(void *pvParameters );
 void checkSPC ();
 //End of Auto generated function prototypes by Atmel Studio
 
-//int req = 3; //mic REQ line goes to pin 5 through q1 (arduino high pulls request line low)
-//int dat = 2; //mic Data line goes to pin 2
-//int clk = 0; //mic Clock line goes to pin 3
-
 // These are used to get information about static SRAM and flash memory sizes
 extern "C" char __data_start[];    // start of SRAM data
 extern "C" char _end[];     // end of SRAM data (used to check amount of SRAM this program's variables use)
@@ -56,37 +52,6 @@ SpcProcessing spcProcessing;
 Screen screen;
 SerialProcessing serialProcessing;
 
-//SemaphoreHandle_t xSerialSemaphore;
-
-//unsigned long previousMillisSPC = 0;
-//unsigned long previousMillisScreen = 0;
-//unsigned long previousMillisSerialCheck = 0;
-//unsigned long previousMillisSerialCommands = 0;
-//unsigned long previousMillisScan = 0;
-
-
-
-ISR (TIMER4_OVF_vect){
-
-	//if (millis() > previousMillisSPC + 1000)
-	//{
-	//spcProcessing.RunSPCDataLoop();
-
-	//Serial.println(spcProcessing.GetSerialOutputBuffer());
-
-	
-	
-	
-	
-	//previousMillisSPC = millis();
-	//}
-
-	//TCNT4 = 100;
-}
-
-
-
-
 void setup()
 {
 	Serial.begin(SERIAL_BAUD);
@@ -94,16 +59,6 @@ void setup()
 	spcProcessing.init();
 	screen.init();
 	serialProcessing.init();
-
-	//noInterrupts();
-
-	//normal mode
-	//TCCR4A = 0x00;
-	//OCR4A   = 0;
-	//TCCR4B = (1<<CS40);
-	//TIMSK4 |= bit (TOIE4);
-	
-	//interrupts();
 
 	xTaskCreate(
 	TaskRunScreen
@@ -135,46 +90,7 @@ void setup()
 
 void loop()
 {
-	//int loopTtime = millis();
-
-	//while(1){
-
-	//if (millis() > previousMillisScreen + 50)
-	//{
-	//screen.IsInSimulationMode = SIMULATIONACTIVE;
-	////screen.UpdateScreen(spcProcessing.GetDiameter());;
-	//
-	//previousMillisScreen = millis();
-	//}
-	
-	//
-	//if (millis() > previousMillisSerialCommands + 20)
-	//{
-	////if (serialProcessing.newData)
-	////{
-	////Serial.println(serialProcessing.GetSerialOutputBuffer());
-	////}
-	//if (spcProcessing.newData){
-	////Serial.println(spcProcessing.GetSerialOutputBuffer());
-	//spcProcessing.newData = false;
-	//}
-	//else{
-	//spcProcessing.RunSPCDataLoop();
-	//}
-	//previousMillisSerialCommands = millis();
-	//}
-	//
-	//if(millis() > previousMillisSerialCheck + 1)
-	//{
-	////serialProcessing.CheckSerialCommands();
-	//serialProcessing.Poll();
-	//
-	////serialPortExpander.RunSerialExpanderDataLoop();
-	//}
-
-	//Serial.println(millis() - loopTtime);
-	//}
-
+	//nothing to do here, all routines done in tasks
 }
 
 
@@ -187,6 +103,12 @@ void TaskRunScreen(void *pvParameters)  // This is a task.
 
 	for (;;) // A Task shall never return or exit.
 	{
+		if (spcProcessing.HasError())
+		{
+			screen.DisplayError(spcProcessing.GetError());
+		}
+		else{ screen.ClearError();}
+
 		screen.IsInSimulationMode = SIMULATIONACTIVE;
 		screen.UpdateScreen(spcProcessing.GetDiameter());
 
@@ -203,9 +125,10 @@ void TaskCheckSPC(void *pvParameters)  // This is a task.
 	for (;;) // A Task shall never return or exit.
 	{
 		if (spcProcessing.newData){
-			Serial.print(spcProcessing.GetSerialOutputBuffer());
-			Serial.print("   ");
-			Serial.println(millis());
+			Serial.println(spcProcessing.GetSerialOutputBuffer());
+			
+			//Serial.print("   ");
+			//Serial.println(millis());
 			spcProcessing.newData = false;
 		}
 		else{
