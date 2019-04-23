@@ -11,6 +11,16 @@
 Error errorArray[15];
 Vector<Error> errorVector;
 
+char *ErrorCodes[] =
+{
+	"RESERVED",
+	"DIAMETER   DISCONNECT",
+	"SPC  DATA  ERROR"
+
+};
+
+
+
 void startErrorHandler(void)
 {
 	errorVector.setStorage(errorArray);
@@ -32,6 +42,7 @@ void AddError(Error *eError)
 		}
 
 		if (!itemExists){
+			eError->errorDescription =  ErrorCodes[eError->errorCode];
 			errorVector.push_back(*eError);
 		}
 	}
@@ -83,14 +94,34 @@ bool HasErrors(void)
 bool HasErrorCode(byte code)
 {
 
-for (int i = 0; i < errorVector.max_size(); i++)
-{
-	if (errorVector.at(i).errorCode == code)
+	for (int i = 0; i < errorVector.max_size(); i++)
 	{
-		return true;
+		if (errorVector.at(i).errorCode == code)
+		{
+			return true;
+		}
 	}
+
+
+	return false;
 }
 
+Error *GetErrorByCode(byte code)
+{
+	Error *err;
+	//err.errorCode = 0;
+	//err.errorLevel = 0;
+	//err.hardwareType = 0;
 
-return false;
+	for (int i = 0; i < errorVector.max_size(); i++)
+	{
+		if (errorVector.at(i).errorCode == code)
+		{
+			err = &errorVector.at(i);
+		}
+	}
+
+	return err;
+
+
 }

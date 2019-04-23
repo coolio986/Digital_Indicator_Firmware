@@ -17,10 +17,12 @@ typedef struct
 {
 	uint16_t hardwareType; //see hardwareTypes.h
 	//char *command;
-	//char *errorValue;
+	char *errorDescription;
 	byte errorLevel;
 	byte errorCode;
 } Error;
+
+//char *ErrorCodes[];
 
 //errorLevel:
 // 1 = datastream validation failed
@@ -37,6 +39,8 @@ void AddError(Error *eError);
 void ClearError(byte ErrorCode);
 bool HasErrors(void);
 bool HasErrorCode(byte code);
+Error *GetErrorByCode(byte code);
+
 
 
 

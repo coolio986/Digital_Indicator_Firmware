@@ -84,11 +84,16 @@ void Screen::UpdateScreen(float diameter){
 	
 	CONVERT_FLOAT_TO_STRING(SPCDiameter, filamentDiameter);
 
-	if (HasErrorCode(1) || HasErrorCode(2))
+	if (HasErrorCode(1) || HasErrorCode(2)) // for diameter
 	{
-		tft.setTextColor(TFT_RED, TFT_BLACK);
-		tft.drawString("Diameter Error:                        ", 0, 0, 4); //drawString faster then println
-		//tft.drawString(, 150, 0, 4);
+		int errorCode = HasErrorCode(1) ? 1 : 2;
+
+		if (errorCode > 0){
+			if (!previousHadError){ tft.fillRect(0, 0, 320, 25, TFT_BLACK);}
+			tft.setTextColor(TFT_RED, TFT_BLACK);
+			tft.drawString(GetErrorByCode(errorCode
+			)->errorDescription, 0, 0, 4);
+		}
 		previousHadError = true;
 	}
 	else
@@ -97,8 +102,8 @@ void Screen::UpdateScreen(float diameter){
 		if (previousHadError)
 		{
 			previousHadError = false;
-			tft.setTextColor(TFT_GREEN, TFT_BLACK);
-			tft.drawString(" Diameter:                        ", 0, 0, 4); //drawString faster then println
+			//tft.setTextColor(TFT_GREEN, TFT_BLACK);
+			tft.fillRect(0, 0, 320, 25, TFT_BLACK);
 
 		}
 		else
