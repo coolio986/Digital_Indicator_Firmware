@@ -74,3 +74,5 @@ src\libraries\FreeRTOS\variantHooks.cpp
 
 src\libraries\SPI\SPI.cpp
 
+src\libraries\Vector\Vector\Vector.cpp
+

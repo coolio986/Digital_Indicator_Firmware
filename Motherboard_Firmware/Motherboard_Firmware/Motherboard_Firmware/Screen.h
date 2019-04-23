@@ -22,7 +22,7 @@ protected:
 
 private:
 	float SPCDiameter;
-	Error errors[10];
+	
 
 
 
@@ -38,7 +38,6 @@ public:
 	~Screen();
 	void init();
 	void UpdateScreen(float diameter);
-	void DisplayError(Error *eError);
 	void ClearError(void);
 	void AddError(Error *eError);
 
@@ -49,6 +48,7 @@ private:
 	Screen& operator=( const Screen &c );
 	static Screen *firstInstance;
 	void RunScreenSimulation();
+	void DisplayError(void);
 	
 
 }; //Screen

@@ -14,8 +14,8 @@
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
     <Name>Motherboard_Firmware</Name>
-    <RootNamespace>Digital_Indicator_Firmware</RootNamespace>
-    <ArduinoIdeDir>\\bob-server\SSD\3d printer firmware\large-printer\bob-printer\arduino-PR-beta1.9-BUILD-72</ArduinoIdeDir>
+    <RootNamespace>Motherboard_Firmware</RootNamespace>
+    <ArduinoIdeDir>C:\Program Files (x86)\Arduino</ArduinoIdeDir>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
@@ -27,7 +27,7 @@
     <OverrideVtorValue>exception_table</OverrideVtorValue>
     <BootSegment>2</BootSegment>
     <eraseonlaunchrule>0</eraseonlaunchrule>
-    <AssemblyName>Digital_Indicator_Firmware</AssemblyName>
+    <AssemblyName>Motherboard_Firmware</AssemblyName>
     <ResetRule>0</ResetRule>
     <EraseKey />
     <AsfFrameworkConfig>
@@ -49,7 +49,6 @@
       <ToolOptions>
         <InterfaceProperties>
           <JtagDbgClock>4000000</JtagDbgClock>
-          <IspClock>125000</IspClock>
         </InterfaceProperties>
         <InterfaceName>JTAG</InterfaceName>
       </ToolOptions>
@@ -60,6 +59,18 @@
     <avrtoolinterface>JTAG</avrtoolinterface>
     <avrtoolinterfaceclock>4000000</avrtoolinterfaceclock>
     <UseGdb>True</UseGdb>
+    <com_atmel_avrdbg_tool_simulator>
+      <ToolOptions xmlns="">
+        <InterfaceProperties>
+        </InterfaceProperties>
+        <InterfaceName>
+        </InterfaceName>
+      </ToolOptions>
+      <ToolType xmlns="">com.atmel.avrdbg.tool.simulator</ToolType>
+      <ToolNumber xmlns="">
+      </ToolNumber>
+      <ToolName xmlns="">Simulator</ToolName>
+    </com_atmel_avrdbg_tool_simulator>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -77,7 +88,7 @@
           <ListValues>
             <Value>NDEBUG</Value>
             <Value>F_CPU=16000000L</Value>
-            <Value>ARDUINO=</Value>
+            <Value>ARDUINO=10805</Value>
             <Value>ARDUINO_AVR_MEGA2560</Value>
             <Value>ARDUINO_ARCH_AVR</Value>
             <Value>USB_VID=0x2341</Value>
@@ -93,6 +104,8 @@
             <Value>%24(ProjectDir)\..\ArduinoCore\include\Fonts</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\FreeRTOS</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\SPI</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\Vector</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\Vector\Vector</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\variants\mega</Value>
           </ListValues>
         </avrgcc.compiler.directories.IncludePaths>
@@ -109,7 +122,7 @@
           <ListValues>
             <Value>NDEBUG</Value>
             <Value>F_CPU=16000000L</Value>
-            <Value>ARDUINO=</Value>
+            <Value>ARDUINO=10805</Value>
             <Value>ARDUINO_AVR_MEGA2560</Value>
             <Value>ARDUINO_ARCH_AVR</Value>
             <Value>USB_VID=0x2341</Value>
@@ -125,6 +138,8 @@
             <Value>%24(ProjectDir)\..\ArduinoCore\include\Fonts</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\FreeRTOS</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\SPI</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\Vector</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\Vector\Vector</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\variants\mega</Value>
           </ListValues>
         </avrgcccpp.compiler.directories.IncludePaths>
@@ -166,7 +181,7 @@
           <ListValues>
             <Value>DEBUG</Value>
             <Value>F_CPU=16000000L</Value>
-            <Value>ARDUINO=</Value>
+            <Value>ARDUINO=10805</Value>
             <Value>ARDUINO_AVR_MEGA2560</Value>
             <Value>ARDUINO_ARCH_AVR</Value>
             <Value>USB_VID=0x2341</Value>
@@ -182,6 +197,8 @@
             <Value>%24(ProjectDir)\..\ArduinoCore\include\Fonts</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\FreeRTOS</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\SPI</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\Vector</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\Vector\Vector</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\variants\mega</Value>
           </ListValues>
         </avrgcc.compiler.directories.IncludePaths>
@@ -197,7 +214,7 @@
           <ListValues>
             <Value>DEBUG</Value>
             <Value>F_CPU=16000000L</Value>
-            <Value>ARDUINO=</Value>
+            <Value>ARDUINO=10805</Value>
             <Value>ARDUINO_AVR_MEGA2560</Value>
             <Value>ARDUINO_ARCH_AVR</Value>
             <Value>USB_VID=0x2341</Value>
@@ -213,6 +230,8 @@
             <Value>%24(ProjectDir)\..\ArduinoCore\include\Fonts</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\FreeRTOS</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\SPI</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\Vector</Value>
+            <Value>%24(ProjectDir)\..\ArduinoCore\include\libraries\Vector\Vector</Value>
             <Value>%24(ProjectDir)\..\ArduinoCore\include\variants\mega</Value>
           </ListValues>
         </avrgcccpp.compiler.directories.IncludePaths>
@@ -245,6 +264,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Device_Configuration.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Error.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Error.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Fonts\Font16.c">
@@ -331,7 +356,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ArduinoCore\ArduinoCore.cppproj">
       <Name>ArduinoCore</Name>
-      <Project>45bff343-7237-49f0-89ad-e2a2e7545f6c</Project>
+      <Project>b5af6a52-1493-4ce0-aa00-5cfb7b5de09a</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>

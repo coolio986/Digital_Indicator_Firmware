@@ -2,6 +2,8 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+Error.cpp
+
 Fonts\Font16.c
 
 Fonts\Font32rle.c

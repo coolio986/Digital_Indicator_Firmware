@@ -18,6 +18,9 @@
 #include "SpcProcessing.h"
 #include "Screen.h"
 #include "Device_Configuration.h"
+#include "Error.h"
+
+
 
 #define INCLUDE_vTaskDelay   1
 #define configUSE_PREEMPTION 1
@@ -54,35 +57,36 @@ SerialProcessing serialProcessing;
 
 void setup()
 {
-	Serial.begin(SERIAL_BAUD);
+  Serial.begin(SERIAL_BAUD);
 
-	spcProcessing.init();
-	screen.init();
-	serialProcessing.init();
+  spcProcessing.init();
+  screen.init();
+  serialProcessing.init();
+  startErrorHandler();
 
-	xTaskCreate(
-	TaskRunScreen
-	,  (const portCHAR *)"RunScreen"   // A name just for humans
-	,  1000  // This stack size can be checked & adjusted by reading the Stack Highwater
-	,  NULL
-	,  1 // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-	,  NULL );
+  xTaskCreate(
+  TaskRunScreen
+  ,  (const portCHAR *)"RunScreen"   // A name just for humans
+  ,  1000  // This stack size can be checked & adjusted by reading the Stack Highwater
+  ,  NULL
+  ,  1 // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+  ,  NULL );
 
-	xTaskCreate(
-	TaskCheckSPC
-	,  (const portCHAR *)"CheckSPC"   // A name just for humans
-	,  500  // This stack size can be checked & adjusted by reading the Stack Highwater
-	,  NULL
-	,   2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-	,  NULL );
+  xTaskCreate(
+  TaskCheckSPC
+  ,  (const portCHAR *)"CheckSPC"   // A name just for humans
+  ,  500  // This stack size can be checked & adjusted by reading the Stack Highwater
+  ,  NULL
+  ,   2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+  ,  NULL );
 
-	xTaskCreate(
-	TaskCheckSerialCommands
-	,  (const portCHAR *)"CheckSerialCommands"   // A name just for humans
-	,  1000  // This stack size can be checked & adjusted by reading the Stack Highwater
-	,  NULL
-	,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-	,  NULL );
+  xTaskCreate(
+  TaskCheckSerialCommands
+  ,  (const portCHAR *)"CheckSerialCommands"   // A name just for humans
+  ,  1000  // This stack size can be checked & adjusted by reading the Stack Highwater
+  ,  NULL
+  ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+  ,  NULL );
 
 
 
@@ -90,68 +94,72 @@ void setup()
 
 void loop()
 {
-	//nothing to do here, all routines done in tasks
+  //nothing to do here, all routines done in tasks
+
+ 
 }
 
 
 
 void TaskRunScreen(void *pvParameters)  // This is a task.
 {
-	(void) pvParameters;
+  (void) pvParameters;
 
 
 
-	for (;;) // A Task shall never return or exit.
-	{
-		if (spcProcessing.HasError())
-		{
-			screen.DisplayError(spcProcessing.GetError());
-		}
-		else{ screen.ClearError();}
+  for (;;) // A Task shall never return or exit.
+  {
+ 
+    //if (spcProcessing.HasError())
+    //{
+      //screen.AddError(spcProcessing.GetError());
+    //}
+    //else{ screen.ClearError();}
 
-		screen.IsInSimulationMode = SIMULATIONACTIVE;
-		screen.UpdateScreen(spcProcessing.GetDiameter());
+    screen.IsInSimulationMode = SIMULATIONACTIVE;
+    screen.UpdateScreen(spcProcessing.GetDiameter());
 
-		vTaskDelay(50 / portTICK_PERIOD_MS);
-	}
+    vTaskDelay(50 / portTICK_PERIOD_MS);
+  }
 
 }
 
 void TaskCheckSPC(void *pvParameters)  // This is a task.
 {
-	(void) pvParameters;
+  (void) pvParameters;
 
 
-	for (;;) // A Task shall never return or exit.
-	{
-		if (spcProcessing.newData){
-			Serial.println(spcProcessing.GetSerialOutputBuffer());
-			
-			//Serial.print("   ");
-			//Serial.println(millis());
-			spcProcessing.newData = false;
-		}
-		else{
-			spcProcessing.RunSPCDataLoop();
-		}
-		vTaskDelay( 20 / portTICK_PERIOD_MS); // wait for one second
-	}
+  for (;;) // A Task shall never return or exit.
+  {
+    if (spcProcessing.newData){
+      Serial.println(spcProcessing.GetSerialOutputBuffer());
+      
+      //Serial.print("   ");
+      //Serial.println(millis());
+      spcProcessing.newData = false;
+    }
+    else{
+      spcProcessing.RunSPCDataLoop();
+    }
+    vTaskDelay( 20 / portTICK_PERIOD_MS); // wait for one second
+  }
 
 }
 
 void TaskCheckSerialCommands(void *pvParameters)  // This is a task.
 {
-	(void) pvParameters;
+  (void) pvParameters;
 
-	for (;;) // A Task shall never return or exit.
-	{
+  for (;;) // A Task shall never return or exit.
+  {
 
-		serialProcessing.Poll();
+    serialProcessing.Poll();
 
-		vTaskDelay( 100 / portTICK_PERIOD_MS); // wait for one second
-	}
+    vTaskDelay( 100 / portTICK_PERIOD_MS); // wait for one second
+  }
 
 }
+
 
 
 

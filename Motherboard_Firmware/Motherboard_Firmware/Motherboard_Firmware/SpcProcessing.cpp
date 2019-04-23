@@ -51,7 +51,7 @@ void SpcProcessing::init(void)
 
 void ISR_SPC()
 {
-	SPC_ISR_LOCK = true;
+	SPC_ISR_LOCK = true; //lock ISR so main program loop doesn't interrupt
 	rawSPC_ISR[ISR_LOOP_COUNTER++] = (PINA & digitalPinToBitMask(INDICATOR_DAT)) == 0 ? 48 : 49; //Keep track of ISR bits
 
 	if (ISR_LOOP_COUNTER >= 52)
@@ -62,10 +62,10 @@ void ISR_SPC()
 		ISR_LOOP_COUNTER = 0; //set loop counter back to 0
 		for (int i = 0; i < 52; i++)
 		{
-			rawSPC[i] = rawSPC_ISR[i];
+			rawSPC[i] = rawSPC_ISR[i]; //copy voltaile memory to non-volatile and clear the volatile to syncronize the main program loop
 			rawSPC_ISR[i] = 0;
 		}
-		SPC_ISR_LOCK = false;
+		SPC_ISR_LOCK = false; //unlock ISR to syncronize main program loop
 		
 		
 		//detachInterrupt(digitalPinToInterrupt(INDICATOR_CLK));
@@ -86,10 +86,14 @@ void SpcProcessing::RunSPCDataLoop(void)
 
 
 	if ((MAIN_LOOP_COUNTER > ISR_LOOP_COUNTER + 10)){ //track the loops to see if the ISR is still firing. Sometimes it doesn't trigger properly due to the screen updates
+		
 		//Serial.println("loop error");
 		eError.hardwareType = INDICATOR;
-		eError.errorValue = "DIAMETER DEVICE DISCONNECTED";
+		//eError.errorValue = "DIAMETER DEVICE DISCONNECTED";
 		eError.errorLevel = 2;
+		eError.errorCode = 1;
+		AddError(&eError);
+
 		PORTC &= ~digitalPinToBitMask(INDICATOR_REQ); //set req low to stop ISR
 		PORTC |= digitalPinToBitMask(INDICATOR_REQ); //set req high to restart ISR
 		ISR_LOOP_COUNTER = 0;
@@ -101,7 +105,7 @@ void SpcProcessing::RunSPCDataLoop(void)
 	if (!SPC_ISR_LOCK)
 	{
 
-		if (rawSPC[0] == 0){
+		if (rawSPC[0] == 0){ //if position 0 in array equals null then skip
 			//Serial.println("RESETTING FROM NO DATA");
 			//PORTC |= digitalPinToBitMask(INDICATOR_REQ); //set req high to restart ISR
 			return;
@@ -125,8 +129,10 @@ void SpcProcessing::RunSPCDataLoop(void)
 				
 				
 				eError.hardwareType = INDICATOR;
-				eError.errorValue = "SPC DATA ERROR";
+				//eError.errorValue = "SPC DATA ERROR";
 				eError.errorLevel = 1;
+				eError.errorCode = 2;
+				AddError(&eError);
 
 				char sErrorOutput [MAX_CMD_LENGTH] = {0};
 				BuildSerialOutput(&sError, sErrorOutput);
@@ -140,6 +146,9 @@ void SpcProcessing::RunSPCDataLoop(void)
 
 		if (dataStreamValid)
 		{
+
+			ClearError(1);
+			ClearError(2);
 			byte bytes[13] = {0};
 			for (int i = 0; i < 13; i++)
 			{
@@ -185,7 +194,7 @@ void SpcProcessing::RunSPCDataLoop(void)
 			{
 				rawSPC[i] = 0;
 			}
-			eError.errorLevel = 0;
+			
 
 			MAIN_LOOP_COUNTER= ISR_LOOP_COUNTER;
 			PORTC |= digitalPinToBitMask(INDICATOR_REQ); //set req high to restart ISR
